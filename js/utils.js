@@ -57,5 +57,4 @@ function debounce (callback, timeoutDelay = 500) {
   };
 }
 
-
 export { getRandomElements, comparePhotosByComments, isEscKey, showAlert, debounce };

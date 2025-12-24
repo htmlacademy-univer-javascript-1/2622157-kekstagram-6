@@ -3,13 +3,6 @@ import { EFFECTS } from './consts.js';
 let currentEffect = EFFECTS.none;
 let sliderContainer, sliderElement, effectLevelValue, imagePreview;
 
-const onEffectChange = (evt) => {
-  if (evt.target.name === 'effect') {
-    const selectedEffect = EFFECTS[evt.target.value];
-    changeEffect(selectedEffect);
-  }
-};
-
 const updateSliderOptions = (effect) => {
   sliderElement.noUiSlider.updateOptions({
     range: {
@@ -45,6 +38,28 @@ const hideSlider = () => {
   sliderContainer.classList.add('hidden');
 };
 
+const changeEffect = (effect) => {
+  currentEffect = effect;
+  imagePreview.className = '';
+  imagePreview.classList.add(`effects__preview--${effect.name}`);
+
+  if (effect.name === 'none') {
+    hideSlider();
+    resetImageFilter();
+    return;
+  }
+  updateSliderOptions(effect);
+  showSlider();
+  sliderElement.noUiSlider.set(effect.max);
+};
+
+const onEffectsListChange = (evt) => {
+  if (evt.target.name === 'effect') {
+    const selectedEffect = EFFECTS[evt.target.value];
+    changeEffect(selectedEffect);
+  }
+};
+
 const initEffects = () => {
   sliderContainer = document.querySelector('.img-upload__effect-level');
   sliderElement = document.querySelector('.effect-level__slider');
@@ -74,23 +89,8 @@ const initEffects = () => {
     applyEffectToImage(sliderValue);
   });
 
-  effectsList.addEventListener('change', onEffectChange);
+  effectsList.addEventListener('change', onEffectsListChange);
 };
-
-function changeEffect (effect) {
-  currentEffect = effect;
-  imagePreview.className = '';
-  imagePreview.classList.add(`effects__preview--${effect.name}`);
-
-  if (effect.name === 'none') {
-    hideSlider();
-    resetImageFilter();
-  } else {
-    updateSliderOptions(effect);
-    showSlider();
-    sliderElement.noUiSlider.set(effect.max);
-  }
-}
 
 const resetEffects = () => {
   const originalEffectRadio = document.querySelector('#effect-none');
@@ -99,6 +99,10 @@ const resetEffects = () => {
   }
   changeEffect(EFFECTS.none);
   resetImageFilter();
+
+  if (sliderElement && sliderElement.noUiSlider) {
+    sliderElement.noUiSlider.destroy();
+  }
 };
 
 export { initEffects, resetEffects };
